@@ -2,7 +2,7 @@
 
 import unittest
 
-from password_strength import evaluate_password
+from task1_password_checker.password_checker import evaluate_password
 
 
 class PasswordStrengthTests(unittest.TestCase):

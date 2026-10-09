@@ -1,101 +1,95 @@
-# Password Strength Checker
+# Virtual Works Cybersecurity Utilities
 
-A clean, modular Python command-line tool for evaluating password strength using common security best practices. It provides a score, a `Weak`, `Moderate`, or `Strong` classification, and real-time suggestions for improving passwords that do not meet the recommended checks.
+A clean, defensive Python utility suite covering five educational cybersecurity tasks. Each task is isolated in its own folder with a source module, unit tests, and focused documentation.
 
-## Features
-
-- **Length scoring:** Requires at least 8 characters and awards an additional strength point for passwords with 12 or more characters.
-- **Character validation:** Checks for uppercase letters, lowercase letters, numerical digits, and special characters.
-- **Secure input:** Uses Python's `getpass` module so passwords are hidden while entered in the terminal.
-- **Actionable feedback:** Identifies missing criteria and explains exactly what to add.
-- **Reusable core logic:** Exposes `evaluate_password()` as a function that returns a structured `PasswordStrengthResult` dataclass.
-- **Automated tests:** Includes unit tests for classifications, scoring, feedback, and serialization.
-
-## Requirements
-
-- Python 3.9 or newer
-- No third-party dependencies; the project uses only the Python standard library.
-
-## Run the interactive CLI
-
-From the project root, run:
-
-```bash
-python password_strength.py
-```
-
-Enter a password when prompted. Input is hidden, and the tool prints the score, classification, confirmation or improvement message, and any applicable suggestions.
-
-Example output for a strong password:
+## Repository layout
 
 ```text
-Password Strength Result
-=========================
-Score:          6/6
-Classification: Strong
-Strong password: it meets the recommended composition checks.
+task1_password_checker/  # Password composition-strength checker
+task2_port_checker/      # TCP port status checker
+task3_email_analyzer/    # Phishing-risk analyzer
+task4_file_protector/    # Authenticated file encryption/decryption
+task5_login_guard/       # Login rate limiting and lockout
+requirements.txt
 ```
 
-## Use `evaluate_password()` as a reusable module
+## Setup
 
-Import the function into another Python program:
-
-```python
-from password_strength import evaluate_password
-
-result = evaluate_password("Example-Password9!")
-
-print(result.classification)  # Strong
-print(result.score)           # 6
-print(result.to_dict())       # Serialization-friendly dictionary
-```
-
-The returned `PasswordStrengthResult` includes:
-
-- `score` and `max_score`
-- `classification`
-- `criteria`, a dictionary showing each check's result
-- `suggestions`, a list of actionable improvements
-- `message`, a user-facing summary
-
-## Run automated unit tests
-
-From the project root, run:
+Python 3.9+ is recommended.
 
 ```bash
-python -m unittest -v test_password_strength.py
+python -m venv .venv
+# macOS/Linux
+source .venv/bin/activate
+# Windows PowerShell: .venv\\Scripts\\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
-The test suite covers weak, moderate, and strong passwords, feedback for missing criteria, and conversion of results to dictionaries.
+## Tasks and CLI examples
 
-## Scoring and classification
+### Task 1: Password Strength Checker
 
-The tool awards one point for each of these six checks:
+Scores length and character composition, then returns `Weak`, `Moderate`, or `Strong` with actionable suggestions. Input is hidden by the interactive CLI.
 
-1. At least 8 characters
-2. At least 12 characters (extra length point)
-3. At least one uppercase letter (`A-Z`)
-4. At least one lowercase letter (`a-z`)
-5. At least one digit (`0-9`)
-6. At least one special character
-
-Classification is based on the resulting score:
-
-- **Weak:** 0–2 points
-- **Moderate:** 3–5 points
-- **Strong:** 6 points
-
-## Security notes
-
-- Terminal input is hidden with `getpass`; passwords are not printed by the CLI.
-- This is a heuristic strength checker, not a password security service. It does not check whether a password appears in breach databases, is commonly used, or has been reused elsewhere.
-- Do not use real passwords in screenshots, logs, source code, or test fixtures. The example passwords in this repository are illustrative only.
-- For production authentication systems, use a vetted password policy, secure password hashing such as Argon2id or bcrypt, multi-factor authentication, and breached-password screening where appropriate.
-
-## Project files
-
-```text
-password_strength.py       # Core evaluator and interactive CLI
-test_password_strength.py  # Automated unit tests
-README.md                  # Project documentation
+```bash
+python -m task1_password_checker.password_checker
 ```
+
+See [`task1_password_checker/README.md`](task1_password_checker/README.md).
+
+### Task 2: Port Status Checker
+
+Performs authorized TCP connectivity checks with a configurable timeout. Comma-separated ports and inclusive ranges are supported.
+
+```bash
+python -m task2_port_checker.port_checker example.com 22,80,443-445 --timeout 1.5
+```
+
+See [`task2_port_checker/README.md`](task2_port_checker/README.md).
+
+### Task 3: Email Risk Analyzer
+
+Analyzes raw email text and headers for urgency, sensitive-data requests, sender mismatches, and suspicious URLs. It prints a JSON report with score, classification, and itemized indicators.
+
+```bash
+python -m task3_email_analyzer.email_risk_analyzer message.eml
+cat message.txt | python -m task3_email_analyzer.email_risk_analyzer -
+```
+
+See [`task3_email_analyzer/README.md`](task3_email_analyzer/README.md).
+
+### Task 4: File Protection Utility
+
+Uses a random salt, PBKDF2-HMAC-SHA256, and Fernet authenticated encryption. Invalid passwords and corrupted files are rejected.
+
+```bash
+python -m task4_file_protector.file_protector encrypt report.pdf
+python -m task4_file_protector.file_protector decrypt report.pdf.enc
+```
+
+See [`task4_file_protector/README.md`](task4_file_protector/README.md).
+
+### Task 5: Login Attempt Control System
+
+Tracks failures per user/IP key and reports remaining attempts, lockout state, and a cooldown countdown.
+
+```bash
+python -m task5_login_guard.login_guard failure user@example.com --threshold 3 --cooldown 30
+python -m task5_login_guard.login_guard status user@example.com --threshold 3 --cooldown 30
+```
+
+The CLI is a one-shot demonstration; applications should keep one `LoginGuard` instance (or use a shared store in a distributed deployment). See [`task5_login_guard/README.md`](task5_login_guard/README.md).
+
+## Run all tests
+
+```bash
+python -m unittest discover -v
+```
+
+Run an individual task's tests with, for example:
+
+```bash
+python -m unittest -v task3_email_analyzer.test_email_risk_analyzer
+```
+
+These tools are for authorized defensive testing and education. They are heuristics and should be complemented by appropriate production security controls.
